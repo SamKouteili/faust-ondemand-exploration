@@ -77,8 +77,24 @@ We note certain properties $\otimes$ holds:
 It's important to note that $\otimes$ is associative, but not commutative. Indeed, these can fairly easily be intuited, but a formal proof is available [here](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf).
 
 
-### Does the ondemand primitive bring Faust closer to modelling functional reactive paradigms? What about arrow diagrams?
+### Does the ondemand primitive bring Faust closer to modelling Functional Reactive Programs (FRP)?
 
-In short, yes and no? the ondemand primitive is simply a self contained precision tool that allows us to control the act and flow of computation. In a sense, it can be interpreted, or rather applied, as a sort of **switch** operator, supposing the clock stream is configured in such a way. Having said this, ondemand acts as more of a pause than a full stop, and does not perform any linear interpolation.
+This is in many ways a nuanced question with no direct yes/no answer - having said this, we can say that the on-demand primitive brings Faust closer to being able to model functional reactive paradigms. 
+
+In effect, the ondemand primitive is simply a self contained precision tool that allows us to control the act and flow of computation. From this lens, we make the intuitive connection to the **switch** operator from AFRP. Indeed, the ondemand primitive is explicitly *not* the switch operator. However, we can use ondemand to better model the control flow afforded by a switch operator. This best illustrated with an example:
+
+Suppose we had a program, where before some time value $T$, we hope to execute computation $P_1$, while after, we wish to execute $P_2$. Faust does not have a a mechanism for executing switch in the FRP sense (i.e. where supposing we are running some process $P_1$ for some time $T$ before switching to $P_2$). What we can do to approximately simulate this is to have P1 and P2 in parralel and multiply the output of P1 with a boolean $t \leq T$, where $t$ is current time, and similarly multiply the output of P2 with $t > T$. 
+
+![native faust](nativefaust.png)
+
+While this is a functional program, it does not really achieve what we are looking for. For one, it is computationally inefficient, as both $P_1$ and $P_2$ will always be computed no matter the time interval. Furthermore, when $P_2$ is "activated" (when the switch happens), $P_2$ will not find itself at an initial internal state, as indeed it has been running for the entire duration of the program. As such, we see that natively, Faust really did not have a way of modelling the switch operator, both from an efficiency and precision standpoint. 
+
+With all of this in mind, we now consider the ondemand primitive. Indeed, we can rewrite this application as the following.
+
+![ondemand](ondemand.png)
+
+Note that the boolean multiplication is still necessary for $P_1$, as ondemand does not upsample values to 0. Having said this, now we have a program that is still effectively as efficient as we would like it to be, while properly simulating the switch operator, as $P_2$ will not be initialized until $t > T$. 
+
+In a sense, the ondemand operator can be interpreted, or rather applied, as a sort of **switch** operator, supposing the clock stream is configured in such a way. Having said this, ondemand acts as more of a pause than a full stop, and does not perform any linear interpolation.
 
 ### Does Faust operate in discreet or continuous time?
