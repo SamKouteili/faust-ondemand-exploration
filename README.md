@@ -21,10 +21,10 @@ Assuming we pair the program with a clock stream (as seen in the table below), w
 
 In the table above, the clock is a binary stream that triggers on demand computation. The integrator thus only computes for the samples that have been triggered, before the result is then upsampled in a constant way. 
 
-It is relevant to note that, supposing a sort of 'pit' in the clock stream (where we have a stream of ones, followed by some zeros, and then more ones), the ondemand operator does not recurse back through operations, nor does it linearly interpolate. It simply assigns constant values to all untriggered samples.
+It is relevant to note that, supposing a sort of 'pit' in the clock stream (where we have a stream of ones, followed by some zeros, and then more ones), the ondemand operator does not recurse back through operations, nor does it linearly interpolate. It simply assigns constant values to all untriggered samples, and works from there.
 
 
-### Formalization of the ondemand primitive
+### Formalizations of ondemand properties
 
 [[source]](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf) The vast majority of Faust primitives, like $+$, are operations on *signals*. The $\mathtt{ondemand}$ primitive is very different. It is an operation on *signal processors* of type $\mathbb{P}\rightarrow\mathbb{P}$. It transforms a signal processor $P$ into an ondemand version. 
 
@@ -54,7 +54,7 @@ For the same $h=1,0,0,1,0,0,0,1,0\ldots$ we have $h^{+}=0,0,0,1,1,1,1,2,2,\ldots
 
 ### How does ondemand present us with reactive paradigms that don't already exist (i.e. sliders, osc, etc...)?
 
-The ondemand primitive is not a "user-facing" feature, in that it does not add a layer of interactivity with the user. The ondemand primitive is also not directly a compositional tool, in that it is not *directly* intended for temporal segmentation of composition. Rather, what ondemand excels at providing is granularity for optimized computation, which could be critical for embedded systems and microprocessors. Indeed, the purpose of the clock stream is not to send a message in a traditional sense, as is the case with sliders osc messages, and the like. Rather, the clock boolean stream acts _strictly_ as a computation trigger.
+The ondemand primitive is not a "user-facing" feature, in that it does not add a layer of interactivity with the user. The ondemand primitive is also not directly a compositional tool, in that it is not *directly* intended for temporal segmentation of composition. Rather, what ondemand excels at providing is granularity for optimized computation, which could be critical for embedded systems and microprocessors. Indeed, the purpose of the clock stream is not to send a message in a traditional sense, as is the case with sliders, osc messages, and the like. Rather, the clock boolean stream acts _strictly_ as a computation trigger.
 
 ### How do functions with ondemand primitives compose in sequence/parallel/recursively?
 
