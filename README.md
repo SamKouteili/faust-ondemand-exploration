@@ -2,13 +2,13 @@
 
 ### What does the new ondemand primitive offer/solve?
 
-The ondemand (od) primitive presents us with a way of triggering certain computations/functions with a clock stream. Previously, Faust had no means of distinguishing which computations to process, and thus computed them all, for every sample, regardless of the program output. Computations that did not reach/affect the output signal were by default simply multiplied by zero. However, with the new ondemand primitive, computation blocks can now be paired with a binary clock stream that acts as a computation trigger. Depending on the trigger clock stream, the resulting computation is downsampled, computed only at the trigger points, and then upsampled once again. We illustrate the effect of the primitive with an example.
+The ondemand (od) primitive presents us with a way of triggering certain computations/functions with a clock signal. Previously, Faust had no means of distinguishing which computations to process, and thus computed them all, for every sample, regardless of the program output. Computations that did not reach/affect the output signal were by default simply multiplied by zero. However, with the new ondemand primitive, computation blocks can now be paired with a binary clock signal that acts as a computation trigger. Depending on the trigger clock signal, the resulting computation is downsampled, computed only at the trigger points, and then upsampled once again. We illustrate the effect of the primitive with an example.
 
 Suppose we implement an integrator operator (`+~_`) in Faust.
 
 ![integrator](integrator.png)
 
-Assuming we pair the program with a clock stream (as seen in the table below), we can construct a table visualizing how the ondemand operator works with a clock stream to down sample and then upsample the integrator output.
+Assuming we pair the program with a clock signal (as seen in the table below), we can construct a table visualizing how the ondemand operator works with a clock signal to down sample and then upsample the integrator output.
 
 | sample 	| clock 	| downsampled (in) 	| downsampled (out) 	| upsampled 	|
 |--------	|-------	|------------------	|-------------------	|-----------	|
@@ -19,16 +19,16 @@ Assuming we pair the program with a clock stream (as seen in the table below), w
 | 5      	| 1     	| 5                	| 12                	| 12        	|
 | 6      	| 0     	|                  	|                   	| 12        	|
 
-In the table above, the clock is a binary stream that triggers on demand computation. The integrator thus only computes for the samples that have been triggered, before the result is then upsampled in a constant way. 
+In the table above, the clock is a binary signal that triggers on demand computation. The integrator thus only computes for the samples that have been triggered, before the result is then upsampled in a constant way. 
 
-It is relevant to note that, supposing a sort of 'pit' in the clock stream (where we have a stream of ones, followed by some zeros, and then more ones), the ondemand operator does not recurse back through operations, nor does it linearly interpolate. It simply assigns constant values to all untriggered samples, and works from there.
+It is relevant to note that, supposing a sort of 'pit' in the clock signal (where we have a stream of ones, followed by some zeros, and then more ones), the ondemand operator does not recurse back through operations, nor does it linearly interpolate. It simply assigns constant values to all untriggered samples, and works from there.
 
 
 ### Formalizations of ondemand properties
 
 [[source]](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf) The vast majority of Faust primitives, like $+$, are operations on *signals*. The $\mathtt{ondemand}$ primitive is very different. It is an operation on *signal processors* of type $\mathbb{P}\rightarrow\mathbb{P}$. It transforms a signal processor $P$ into an ondemand version. 
 
-If $P$ has $n$ inputs and $m$ outputs, then `ondemand`$(P)$ has $n+1$ (adding the clock stream) inputs and $m$ outputs. The additional input of `ondemand`$(P)$ is a clock signal $h$ that indicates by a $1$ when there is a computation demand, and by $0$ otherwise. In other words, $h(t)=1$ means that there is a computation demand at time $t$.
+If $P$ has $n$ inputs and $m$ outputs, then `ondemand`$(P)$ has $n+1$ (adding the clock signal) inputs and $m$ outputs. The additional input of `ondemand`$(P)$ is a clock signal $h$ that indicates by a $1$ when there is a computation demand, and by $0$ otherwise. In other words, $h(t)=1$ means that there is a computation demand at time $t$.
 
 $$
 \frac{P:n\rightarrow m}{\mathtt{ondemand}(P):1+n\rightarrow m}
