@@ -68,9 +68,9 @@ $$
 
 We note certain properties $\otimes$ holds:
 
-- Identity: $1_h\otimes h &= h\otimes 1_h = h$
-- Zero: $0_h\otimes h &= h\otimes 0_h = 0_h$
-- Generally, $(h_0\otimes h_1)=h_1*(h_0\uparrow h_1)$
+- Identity: $ 1_h \otimes h = h\otimes 1_h = h$
+- Zero: $ 0_h \otimes h = h\otimes 0_h = 0_h$
+- Generally, $ ( h_0 \otimes h_1) = h_1 * (h_0 \uparrow h_1)$
 
 It's important to note that $\otimes$ is associative, but not commutative. Indeed, these can fairly easily be intuited, but a formal proof is available [here](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf).
 
