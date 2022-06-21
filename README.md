@@ -2,13 +2,13 @@
 
 ### What does the new ondemand primitive offer/solve?
 
-The ondemand (od) primitive presents us with a way of triggering certain computations/functions with a clock stream. Previously, Faust had no means of distinguishing which computations to process, and thus computed them all, regardless of the program output. Computations that did not reach/affect the output signal were by default simply multiplied by zero. However, with the new ondemand primitive, computation blocks can now be paired with a binary clock stream that acts as a computation trigger. Depending on the trigger clock stream, the resulting computation is downsampled, computed only at the trigger points, and then upsampled once again. Indeed, formally, supposing that a computation block takes in $n$ signals and outputs $m$ signals, an ondemand iteration would take $n+1$ inputs (adding the clock stream), wihle still returning $m$ signals. 
+The ondemand (od) primitive presents us with a way of triggering certain computations/functions with a clock stream. Previously, Faust had no means of distinguishing which computations to process, and thus computed them all, for every sample, regardless of the program output. Computations that did not reach/affect the output signal were by default simply multiplied by zero. However, with the new ondemand primitive, computation blocks can now be paired with a binary clock stream that acts as a computation trigger. Depending on the trigger clock stream, the resulting computation is downsampled, computed only at the trigger points, and then upsampled once again. We illustrate the effect of the primitive with an example.
 
-Consider the following example - suppose we implement an integrator operator (`+~_`) in Faust.
+Suppose we implement an integrator operator (`+~_`) in Faust.
 
 ![integrator](integrator.png)
 
-We can construct a table visualizing how the ondemand operator works with a clock stream to down sample and then upsample the integrator output.
+Assuming we pair the program with a clock stream (as seen in the table below), we can construct a table visualizing how the ondemand operator works with a clock stream to down sample and then upsample the integrator output.
 
 | sample 	| clock 	| downsampled (in) 	| downsampled (out) 	| upsampled 	|
 |--------	|-------	|------------------	|-------------------	|-----------	|
@@ -26,7 +26,7 @@ In the table above, the clock is a binary stream that triggers on demand computa
 
 [[source]](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf) The vast majority of Faust primitives, like $+$, are operations on *signals*. The $\mathtt{ondemand}$ primitive is very different. It is an operation on *signal processors* of type $\mathbb{P}\rightarrow\mathbb{P}$. It transforms a signal processor $P$ into an ondemand version. 
 
-If $P$ has $n$ inputs and $m$ outputs, then `ondemand`$(P)$ has $n+1$ inputs and $m$ outputs. The additional input of `ondemand`$(P)$ is a clock signal $h$ that indicates by a $1$ when there is a computation demand, and by $0$ otherwise. In other words, $h(t)=1$ means that there is a computation demand at time $t$.
+If $P$ has $n$ inputs and $m$ outputs, then `ondemand`$(P)$ has $n+1$ (adding the clock stream) inputs and $m$ outputs. The additional input of `ondemand`$(P)$ is a clock signal $h$ that indicates by a $1$ when there is a computation demand, and by $0$ otherwise. In other words, $h(t)=1$ means that there is a computation demand at time $t$.
 
 $$
 \frac{P:n\rightarrow m}{\mathtt{ondemand}(P):1+n\rightarrow m}
@@ -52,13 +52,13 @@ For the same $h=1,0,0,1,0,0,0,1,0\ldots$ we have $h^{+}=0,0,0,1,1,1,1,2,2,\ldots
 
 ### How does ondemand present us with reactive paradigms that don't already exist (i.e. sliders, osc, etc...)?
 
-The ondemand primitive is not a "user-facing" feature, in that it does not add a layer of interactivity with the user. The ondemand primitive is also not directly a compositional tool, in that it is not intended for temporal segmentation of composition. Rather, what ondemand excels at providing is granularity for optimized computation, which could be critical for embedded systems and microprocessors. Indeed, the purpose of the clock stream is not to send a message in a traditional sense, as is the case with sliders osc messages, and the like. Rather, the clock boolean stream acts strictly as a computation trigger.
+The ondemand primitive is not a "user-facing" feature, in that it does not add a layer of interactivity with the user. The ondemand primitive is also not directly a compositional tool, in that it is not *directly* intended for temporal segmentation of composition. Rather, what ondemand excels at providing is granularity for optimized computation, which could be critical for embedded systems and microprocessors. Indeed, the purpose of the clock stream is not to send a message in a traditional sense, as is the case with sliders osc messages, and the like. Rather, the clock boolean stream acts _strictly_ as a computation trigger.
 
 ### How do functions with ondemand primitives compose in sequence/parallel/recursively?
 
 Indeed, the introduction of the ondemand primitive raises questions regarding its integration with other operations. Having said this, the behavior of two ondemand computations in parallel and/or sequence is fairly straightforward. As the ondemand primitve upsamples its results back up, effectively, the primitive has no bearing on sequential or parallel computations, other than the fact that the produced results will by nature be less granular.
 
-[[source]](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf) There is however the question of composing two ondemand primitives to one computation. Let's start by defining some additional notation. Instead of writing the on-demand version of $P$ controlled by clock $h$ as the partial application: `ondemand`$(P)(h)$, we will simply write $P \downarrow h$. Let's also notate $1_h=1,1,1,\ldots$ the clock signal that contains only 1s, that is a demand every tick, and $0_h=0,0,0,\ldots$ the clock signal that contains only 0s and therefore no computation demands at all.
+[[source]](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf) There is however the question of composing two ondemand primitives to one computation which may be a little more nuanced. Let's start by defining some additional notation. Instead of writing the on-demand version of $P$ controlled by clock $h$ as the partial application: `ondemand`$(P)(h)$, we will simply write $P \downarrow h$. Let's also notate $1_h=1,1,1,\ldots$ the clock signal that contains only 1s, that is a demand every tick, and $0_h=0,0,0,\ldots$ the clock signal that contains only 0s and therefore no computation demands at all.
 
 We are interested in understanding what happens when we write something like: $( P\downarrow h_0 ) \downarrow h_1)$ . Let's call $\otimes$ the operation that combines two clock signals and such that:
 
