@@ -10,7 +10,7 @@ Consider the following example - suppose we implement an integrator operator in 
 
 ![](integrator.png)
 
-
+<img src="integrator.jpg" alt="integrator" width="200"/>
 
 ### How is ondemand implemented under the hood?
 
