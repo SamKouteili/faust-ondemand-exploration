@@ -19,7 +19,9 @@ Assuming we pair the program with a clock stream (as seen in the table below), w
 | 5      	| 1     	| 5                	| 12                	| 12        	|
 | 6      	| 0     	|                  	|                   	| 12        	|
 
-In the table above, the clock is a binary stream that triggers on demand computation. The integrator thus only computes for the samples that have been triggered, before the result is then upsampled in a constant way.
+In the table above, the clock is a binary stream that triggers on demand computation. The integrator thus only computes for the samples that have been triggered, before the result is then upsampled in a constant way. 
+
+It is relevant to note that, supposing a sort of 'pit' in the clock stream (where we have a stream of ones, followed by some zeros, and then more ones), the ondemand operator does not recurse back through operations, nor does it linearly interpolate. It simply assigns constant values to all untriggered samples.
 
 
 ### Formalization of the ondemand primitive
