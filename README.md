@@ -96,5 +96,3 @@ With all of this in mind, we now consider the ondemand primitive. Indeed, we can
 Note that the boolean multiplication is still necessary for $P_1$, as ondemand does not upsample values to 0. Having said this, now we have a program that is still effectively as efficient as we would like it to be, while properly simulating the switch operator, as $P_2$ will not be initialized until $t > T$. 
 
 In a sense, the ondemand operator can be interpreted, or rather applied, as a sort of **switch** operator, supposing the clock stream is configured in such a way. Having said this, ondemand acts as more of a pause than a full stop, and does not perform any linear interpolation.
-
-### Does Faust operate in discreet or continuous time?
