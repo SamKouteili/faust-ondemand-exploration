@@ -104,5 +104,5 @@ Note that the boolean multiplication is still necessary for $P_1$, as ondemand d
 In a sense, the ondemand operator can be interpreted, or rather applied, as a sort of **switch** operator, supposing the clock stream is configured in such a way. Having said this, ondemand acts as more of a pause than a full stop, and does not perform any linear interpolation.
 
 ### Does Faust operate in discreet or continuous time?
-Yes, Faust programs denote functions on signals and these signals are of type $\mathbb{Z}\rightarrow\mathbb{R}$.
+Faust operates in discreet time. Faust programs denote functions on signals and these signals are discreet functions of time of type $\mathbb{Z}\rightarrow\mathbb{R}$.
 
