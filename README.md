@@ -1,3 +1,9 @@
+---
+title: "Ondemand(od): Faust's new reactive primitive"
+author: My name
+header-includes:
+---
+
 # Ondemand(od): Faust's new reactive primitive
 
 ### What does the new ondemand primitive offer/solve?
@@ -70,9 +76,9 @@ $$
 
 We note certain properties $\otimes$ holds:
 
-- Identity: $ 1_h \otimes h = h\otimes 1_h = h$
-- Zero: $ 0_h \otimes h = h\otimes 0_h = 0_h$
-- Generally, $ ( h_0 \otimes h_1) = h_1 * (h_0 \uparrow h_1)$
+- Identity: $1_h \otimes h = h\otimes 1_h = h$
+- Zero: $0_h \otimes h = h\otimes 0_h = 0_h$
+- Generally, $(h_0 \otimes h_1) = h_1 * (h_0 \uparrow h_1)$
 
 It's important to note that $\otimes$ is associative, but not commutative. Indeed, these can fairly easily be intuited, but a formal proof is available [here](https://github.com/orlarey/faust-ondemand-spec/blob/newmaster/spec.pdf).
 
@@ -96,3 +102,7 @@ With all of this in mind, we now consider the ondemand primitive. Indeed, we can
 Note that the boolean multiplication is still necessary for $P_1$, as ondemand does not upsample values to 0. Having said this, now we have a program that is still effectively as efficient as we would like it to be, while properly simulating the switch operator, as $P_2$ will not be initialized until $t > T$. 
 
 In a sense, the ondemand operator can be interpreted, or rather applied, as a sort of **switch** operator, supposing the clock stream is configured in such a way. Having said this, ondemand acts as more of a pause than a full stop, and does not perform any linear interpolation.
+
+### Does Faust operate in discreet or continuous time?
+Yes, Faust programs denote functions on signals and these signals are of type $\mathbb{Z}\rightarrow\mathbb{R}$.
+
